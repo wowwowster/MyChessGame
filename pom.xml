@@ -16,6 +16,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<archunit-junit5.version>0.22.0</archunit-junit5.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -28,6 +31,26 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.tngtech.archunit</groupId>
+			<artifactId>archunit-junit5-api</artifactId>
+			<version>${archunit-junit5.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Adding the engine dependency to the surefire-plugin unfortunately does not work in the current version. -->
+		<!-- https://www.archunit.org/userguide/html/000_Index.html#_junit_5 -->
+		<dependency>
+			<groupId>com.tngtech.archunit</groupId>
+			<artifactId>archunit-junit5-engine</artifactId>
+			<version>${archunit-junit5.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-console</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -37,6 +60,41 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+		<plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-antrun-plugin</artifactId>
+			<executions>
+				<execution>
+					<!--Work around. Surefire does not use JUnit's Test Engine discovery functionality -->
+					<id>prepare cucumber feature files</id>
+					<phase>integration-test</phase>
+					<goals>
+						<goal>run</goal>
+					</goals>
+					<configuration>
+						<target>
+							<echo message="Running JUnit Platform CLI"/>
+							<java classname="org.junit.platform.console.ConsoleLauncher"
+								  fork="true"
+								  failonerror="true"
+								  newenvironment="true"
+								  maxmemory="512m"
+								  classpathref="maven.test.classpath">
+								<arg value="--include-engine"/>
+								<arg value="cucumber"/>
+								<arg value="--scan-classpath"/>
+								<arg value="${project.build.testOutputDirectory}"/>
+							</java>
+						</target>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+			<!-- jhipster-needle-maven-add-plugin-management -->
+		</plugins>
+		</pluginManagement>
 	</build>
 
 </project>
