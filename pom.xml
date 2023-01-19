@@ -23,6 +23,7 @@
         <archunit-junit5.version>0.22.0</archunit-junit5.version>
         <!-- Plugin versions -->
         <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
+        <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -95,6 +96,43 @@
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>${maven-clean-plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>default-resources</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                <useDefaultDelimiters>false</useDefaultDelimiters>
+                                <delimiters>
+                                    <delimiter>#</delimiter>
+                                </delimiters>
+                                <resources>
+                                    <resource>
+                                        <directory>src/main/resources/</directory>
+                                        <filtering>true</filtering>
+                                        <includes>
+                                            <include>config/*.yml</include>
+                                        </includes>
+                                    </resource>
+                                    <resource>
+                                        <directory>src/main/resources/</directory>
+                                        <filtering>false</filtering>
+                                        <excludes>
+                                            <exclude>config/*.yml</exclude>
+                                        </excludes>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
                 <!-- jhipster-needle-maven-add-plugin-management -->
             </plugins>
         </pluginManagement>
@@ -103,6 +141,10 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                 </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <configuration>
